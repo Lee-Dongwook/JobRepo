@@ -1,7 +1,6 @@
 plugins {
     id 'java'
-    id 'war' // JSP / Servlet 기반 WAR 구성
-    id 'org.gretty' version '4.1.0' // Tomcat , Gretty
+    id 'application'
 }
 
 group = 'com.example'
@@ -18,29 +17,36 @@ repositories {
 }
 
 ext {
-    springVersion = '5.3.37'
+    springVersion = '6.1.12'
 }
 
 dependencies {
     // Spring MVC
     implementation "org.springframework:spring-webmvc:${springVersion}"
     
-    // Servlet / JSP
-    providedCompile 'javax.servlet:javax.servlet-api:4.0.1'
-    implementation 'javax.servlet:jstl:1.2'
+    // Jakarta Servlet/JSP API
+    compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
+    implementation "jakarta.servlet.jsp:jakarta.servlet.jsp-api:3.1.1"
+    implementation "jakarta.el:jakarta.el-api:5.0.1"
+
+    // JSP 엔진 (Jasper)
+    implementation "org.apache.tomcat.embed:tomcat-embed-core:10.1.28"
+    implementation "org.apache.tomcat.embed:tomcat-embed-jasper:10.1.28"
+
+    // JSTL
+    implementation "jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.0"
+    runtimeOnly "org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1"
 
     // Logging
-    implementation 'ch.qos.logback:logback-classic:1.2.13'
+    implementation 'ch.qos.logback:logback-classic:1.5.6'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
 }
 
-tasks.test {
-    useJUnitPlatform()
+application {
+    mainClass = 'com.example.app.EmbeddedTomcatServer'
 }
 
-gretty {
-    servletContainer = 'tomcat9'
-    contextPath = '/'
-    httpPort = 8080
+tasks.test {
+    useJUnitPlatform()
 }
